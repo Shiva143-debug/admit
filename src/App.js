@@ -1,25 +1,37 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import ForgotPassword from "./ForgotPassword"
+import ContactList from './ContactList';
+import UploadFile from './UploadFile';
+import VerifyEmail from "./VerifyEmail"
+import Login from './Login';
+import Register from './Register';
 import './App.css';
 
-function App() {
+const App = () => {
+  const isAuthenticated = !!localStorage.getItem('token'); 
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Register />} />
+          <Route path="/login" element={<Login />}
+          //  element={!isAuthenticated ? <Login /> : <Navigate to="/contacts" />}
+            />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route path="/verify/:token" element={<VerifyEmail />} />
+          {isAuthenticated && (
+            <>
+              <Route path="/contacts" element={<ContactList />} />
+              <Route path="/upload-file" element={<UploadFile />} />
+            </>
+          )}
+          <Route path="*" element={<Navigate to={isAuthenticated ? '/contacts' : '/login'} />} />
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
