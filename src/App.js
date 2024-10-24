@@ -6,6 +6,7 @@ import UploadFile from './UploadFile';
 import VerifyEmail from "./VerifyEmail"
 import Login from './Login';
 import Register from './Register';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 const App = () => {

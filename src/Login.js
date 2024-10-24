@@ -36,14 +36,21 @@ const Login = () => {
   }
 
   return (
-    <form onSubmit={handleLogin} className="login-form">
+    <form onSubmit={handleLogin} className="register-form">
       <h2 className="form-title">Login</h2>
       <p>If you don't have already an Account? <span  onClick={onRegister} style={{color:"blue",cursor:"pointer"}}>Register</span></p>
+      <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="form-input" required/>
+        </div>
 
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="form-input" required/>
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="form-input" required/>
+      <div className="form-group">
+          <label htmlFor="password">Password: </label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="form-input" required/>
+        </div>
+
       <p style={{float:"right",color:"blue",cursor:"pointer"}} onClick={forgotPassword}>Forgot Password?</p>
-      <button type="submit" className="form-button" disabled={loading}>{loading ? <div className="spinner"></div> : "Login"} </button>
+      <button type="submit" className="form-button mt-5" disabled={loading}>{loading ? <div className="spinner"></div> : "Login"} </button>
     </form>
   );
 };
