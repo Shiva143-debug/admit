@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./App.css"
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,7 @@ const Login = () => {
       const response = await axios.post('https://screeching-chivalrous-stamp.glitch.me/login', { email, password, });
       localStorage.setItem('token', response.data.token);
       alert("login successful");
+      setIsAuthenticated(response.data.token); 
       navigate("/contacts");
     } catch (error) {
       alert('Invalid login credentials');

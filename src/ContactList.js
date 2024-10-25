@@ -16,7 +16,7 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import './App.css';
 
-const ContactList = () => {
+const ContactList = ({ setIsAuthenticated }) => {
   const fileInputRef = useRef(null);
   const [contacts, setContacts] = useState([]);
   const [filter, setFilter] = useState('');
@@ -248,7 +248,9 @@ const ContactList = () => {
 
   const onLogout = () => {
     localStorage.removeItem('token');
+    let token =localStorage.getItem('token');
     // navigate("/login")
+    setIsAuthenticated(token); 
     navigate('/login', { replace: true });
   }
 

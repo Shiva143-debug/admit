@@ -71,13 +71,15 @@ const AddContact = ({ editData, onClose }) => {
 
       <div className="form-group">
         <label htmlFor="phone">Mobile Number:</label>
-        <input type="number" className="form-input" onChange={(e) => {
+        <input type="num" className="form-input" onChange={(e) => {
           const val = e.target.value;
           if (/^\d{0,10}$/.test(val)) {
             setPhone(val);
           }
         }} placeholder="Enter Mobile Number" value={phone} />
       </div>
+
+      
 
       <div className="form-group">
         <label htmlFor="address">Address:</label>

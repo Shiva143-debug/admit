@@ -29,22 +29,13 @@ const App = () => {
   return (
     <Router>
       <div className="App">
-        <Routes>
-          <Route path="/" element={<Register />} />
-          <Route path="/login"  element={!localStorage.getItem('token') ? <Login /> : <Navigate to="/contacts" />}/> 
-          <Route path="/contacts" element={localStorage.getItem('token') ? <ContactList /> : <Navigate to="/login" />} />
-
-          {/* <Route path="/login" element={<Login />} />
-          <Route path="/contacts" element={<ContactList />} /> */}
-
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
+      <Routes>
+          <Route path="/" element={!isAuthenticated ? <Register/> : <Navigate to="/contacts" />} />
+          <Route path="/login" element={!isAuthenticated ? <Login setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/contacts" />} />
+          <Route path="/contacts" element={isAuthenticated ? <ContactList setIsAuthenticated={setIsAuthenticated}/> : <Navigate to="/login" />} />
+          <Route path="/forgotPassword" element={!isAuthenticated ? <ForgotPassword/> : <Navigate to="/contacts" />} />
           <Route path="/verify/:token" element={<VerifyEmail />} />
-          {/* {isAuthenticated && (
-            <>
-              <Route path="/contacts" element={<ContactList />} />
-            </>
-          )} */}
-          <Route path="*" element={<Navigate to={localStorage.getItem('token') ? '/contacts' : '/login'} />} />
+          <Route path="*" element={<Navigate to={isAuthenticated ? '/contacts' : '/login'} />} />
         </Routes>
       </div>
     </Router>
