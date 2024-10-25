@@ -39,9 +39,7 @@ const AddContact = ({ editData, onClose }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-
       if (editData) {
-
         await axios.put(`https://screeching-chivalrous-stamp.glitch.me/contacts/${editData.id}`, { name, email, phone, address, timezone, }, { headers: { Authorization: `Bearer ${token}` }, });
         alert('Contact updated successfully');
       } else {
@@ -58,7 +56,6 @@ const AddContact = ({ editData, onClose }) => {
     }
   };
 
-
   return (
     <form className="contact-form" onSubmit={handleAddContact}>
       <h2 className="form-title">{editData ? "Update Contact" : "Add Contact"}</h2>
@@ -74,19 +71,18 @@ const AddContact = ({ editData, onClose }) => {
 
       <div className="form-group">
         <label htmlFor="phone">Mobile Number:</label>
-        <input type="number" className="form-input" onChange={(e) => {const val = e.target.value;
-              if (/^\d{0,10}$/.test(val)) {
-                setPhone(val);
-              }
-            }}
-             placeholder="Enter Mobile Number" value={phone}  />
+        <input type="number" className="form-input" onChange={(e) => {
+          const val = e.target.value;
+          if (/^\d{0,10}$/.test(val)) {
+            setPhone(val);
+          }
+        }} placeholder="Enter Mobile Number" value={phone} />
       </div>
 
       <div className="form-group">
         <label htmlFor="address">Address:</label>
         <input type="text" className="form-input" placeholder="Enter Address" value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
-
 
       <div className="form-group">
         <label htmlFor="timezone">Timezone:</label>
@@ -97,7 +93,6 @@ const AddContact = ({ editData, onClose }) => {
           ))}
         </select>
       </div>
-
 
       <button type="submit" className="form-button mt-3" disabled={loading}>{loading ? <div className="spinner"></div> : (editData ? "Update Contact" : "Add Contact")} </button>
     </form>

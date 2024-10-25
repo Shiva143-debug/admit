@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import AddContact from './AddContact';
@@ -10,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
+import { useNavigate } from 'react-router-dom';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import 'react-datetime/css/react-datetime.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
@@ -28,6 +27,7 @@ const ContactList = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
 
   const fetchContacts = async () => {
@@ -94,34 +94,16 @@ const ContactList = () => {
     const name = contact.name ? contact.name.toLowerCase() : (contact.Name ? contact.Name.toLowerCase() : '');
     const email = contact.email ? contact.email.toLowerCase() : (contact.Email ? contact.Email.toLowerCase() : '');
     const address = contact.address ? contact.address.toLowerCase() : (contact.Address ? contact.Address.toLowerCase() : '');
-    // const phone = contact.phone? contact.phone.toLowerCase(): (contact.MobileNumber ? contact.MobileNumber.toLowerCase() : '');
     return (
       name.includes(lowerCaseFilter) ||
       email.includes(lowerCaseFilter) ||
       address.includes(lowerCaseFilter)
-      // phone.includes(lowerCaseFilter)
     );
   }).sort((a, b) => {
     const aField = a[sortField] ? a[sortField].toLowerCase() : '';
     const bField = b[sortField] ? b[sortField].toLowerCase() : '';
     return aField > bField ? 1 : -1;
-    
   });
- 
-  // .sort((a, b) => (a[sortField].toLowerCase() > b[sortField].toLowerCase() ? 1 : -1));
-
-  // const filteredContacts = contacts
-  //   .filter((contact) => {
-  //     const lowerCaseFilter = filter.toLowerCase();
-  //     return (
-  //       contact.name.toLowerCase().includes(lowerCaseFilter) ||
-  //       contact.email.toLowerCase().includes(lowerCaseFilter) ||
-  //       contact.address.toLowerCase().includes(lowerCaseFilter) ||
-  //       contact.phone.toLowerCase().includes(lowerCaseFilter)
-  //     );
-  //   })
-  //   .sort((a, b) => (a[sortField].toLowerCase() > b[sortField].toLowerCase() ? 1 : -1));
-
 
   const fileHandler = async (event) => {
     const file = event.target.files[0];
@@ -149,6 +131,7 @@ const ContactList = () => {
           const address = contact.Address || contact.address || '';
           const timezone = contact.Timezone || 'Asia/Kolkata';
           try {
+            setLoading(true);
             const token = localStorage.getItem('token');
             await axios.post(
               'https://screeching-chivalrous-stamp.glitch.me/contacts',
@@ -156,14 +139,16 @@ const ContactList = () => {
               { headers: { Authorization: `Bearer ${token}` } }
             );
             alert(`Contact ${name} added successfully`);
-            // setContacts(contactObjects);
             newContacts.push({ name, email, phone, address, timezone });
-            
+
           } catch (error) {
             alert(`Failed to add contact ${name}: beacuse email/user already Exists.`, error);
           }
+          finally {
+            setLoading(false);
+          }
         }
-        setContacts(prevContacts => [...prevContacts, ...newContacts]); 
+        setContacts(prevContacts => [...prevContacts, ...newContacts]);
         fetchContacts()
       } else {
         console.log('No data found in the Excel file.');
@@ -213,6 +198,7 @@ const ContactList = () => {
     setIsEditContact(true)
     setEditData(rowData)
   }
+
   const onDelete = async (rowData) => {
     if (window.confirm(`Are you sure you want to delete ${rowData.name}?`)) {
       try {
@@ -236,12 +222,6 @@ const ContactList = () => {
     }
   };
 
-  // const formattedContacts = filteredContacts.map(contact => ({
-  //   ...contact,
-  //   created_at: format(new Date(contact.created_at), 'dd/MM/yyyy hh:mm a'),
-  //   updated_at: format(new Date(contact.updated_at), 'dd/MM/yyyy hh:mm a')
-
-  // }));
   const formattedContacts = filteredContacts.map(contact => ({
     ...contact,
     created_at: contact.created_at ? format(new Date(contact.created_at), 'dd/MM/yyyy hh:mm a') : 'N/A', // or some default value
@@ -266,10 +246,18 @@ const ContactList = () => {
     window.location.href = `https://screeching-chivalrous-stamp.glitch.me${fileEndpoint}`;
   };
 
+  const onLogout = () => {
+    localStorage.removeItem('token');
+    navigate("/login")
+  }
+
   return (
     <div className='m-5'>
-      <h2 className="form-title">Contacts List</h2>
 
+      <div className="d-flex justify-content-between align-items-center position-relative">
+        <h1 className="form-title position-absolute start-50 translate-middle-x">Contacts List</h1>
+        <button style={{ width: "200px" }} className="form-button ms-auto mb-2" onClick={onLogout}>Logout</button>
+      </div>
       <Card style={{ padding: '20px' }} >
         <div style={{ marginTop: '5px' }}>
           <div className="filter-section">
@@ -300,11 +288,9 @@ const ContactList = () => {
           </DataTable>
         </div>
       </Card>
-
       <Dialog visible={showAddContactDialog} modal onHide={() => handleCloseDialog()}>
         <AddContact onClose={handleCloseDialog} />
       </Dialog>
-
       <Dialog visible={isEditContact} modal onHide={() => handleCloseUpdateDialog()}>
         <AddContact onClose={handleCloseUpdateDialog} editData={editData} />
       </Dialog>

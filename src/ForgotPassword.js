@@ -35,7 +35,6 @@ const ForgotPassword = () => {
                 <label htmlFor="email">Email:</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" className="form-input" required />
             </div>
-
             <button type="submit" className="form-button mt-5" disabled={loading}>{loading ? <div className="spinner"></div> : "Request Password Reset"} </button>
         </form>
     );
