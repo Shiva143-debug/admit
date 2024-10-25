@@ -24,7 +24,7 @@ const Register = () => {
         setAddress('');
       }
     } catch (error) {
-      alert("An error Occured! Please try again Later")
+      alert("Email/User Already Exists! Use different Mail")
     }
     finally {
       setLoading(false);

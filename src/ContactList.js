@@ -248,7 +248,8 @@ const ContactList = () => {
 
   const onLogout = () => {
     localStorage.removeItem('token');
-    navigate("/login")
+    // navigate("/login")
+    navigate('/login', { replace: true });
   }
 
   return (
