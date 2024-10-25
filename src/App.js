@@ -16,8 +16,9 @@ const App = () => {
       <div className="App">
         <Routes>
           <Route path="/" element={<Register />} />
-          <Route path="/login" element={<Login />}/>
-           {/* element={!isAuthenticated ? <Login /> : <Navigate to="/contacts" />}/> */}
+          <Route path="/login" 
+          // element={<Login />}/>
+           element={!isAuthenticated ? <Login /> : <Navigate to="/contacts" />}/> 
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/verify/:token" element={<VerifyEmail />} />
           {isAuthenticated && (
