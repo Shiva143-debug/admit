@@ -97,7 +97,7 @@ const ContactList = ({ setIsAuthenticated }) => {
     const name = contact.name ? contact.name.toLowerCase() : (contact.Name ? contact.Name.toLowerCase() : '');
     const email = contact.email ? contact.email.toLowerCase() : (contact.Email ? contact.Email.toLowerCase() : '');
     const address = contact.address ? contact.address.toLowerCase() : (contact.Address ? contact.Address.toLowerCase() : '');
-    const phone = contact.phone ? contact.phone.toLowerCase() : (contact.phone ? contact.phone.toLowerCase() : '');
+    const phone = contact.phone ?  String(contact.phone).toLowerCase() : (contact.MobileNumber ?  String(contact.MobileNumber).toLowerCase() : '');
 
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
