@@ -9,17 +9,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 const App = () => {
-  // const isAuthenticated = !!localStorage.getItem('token');
-
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
-
   useEffect(() => {
     const handleTokenChange = () => {
       setIsAuthenticated(!!localStorage.getItem('token'));
     };
-
-    window.addEventListener('storage', handleTokenChange); // listens to localStorage changes
-
+    window.addEventListener('storage', handleTokenChange);
     return () => {
       window.removeEventListener('storage', handleTokenChange);
     };

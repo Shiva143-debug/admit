@@ -25,6 +25,10 @@ const Register = () => {
       }
     } catch (error) {
       alert("Email/User Already Exists! Use different Mail")
+      setName('');
+      setEmail('');
+      setMobileNumber('');
+      setAddress('');
     }
     finally {
       setLoading(false);

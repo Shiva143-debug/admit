@@ -9,13 +9,14 @@ const VerifyEmail = () => {
     useEffect(() => {
         const verifyToken = async () => {
             try {
-                const response = await axios.post(`https://screeching-chivalrous-stamp.glitch.me/verify/${token}`, {
+                 await axios.post(`https://screeching-chivalrous-stamp.glitch.me/verify/${token}`, {
                 });
                 alert("Verification Done. Password Sent to your EMail check and login.")
                 navigate('/login');
             } catch (error) {
                 console.error('Error verifying email:', error);
-                alert(error.response.data.error || 'Verification failed. Please try again.');
+                alert("Already Verification Done. Please Login with valid credentials. check the mail for password");
+                navigate('/login');
             }
         };
 

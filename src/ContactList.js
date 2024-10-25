@@ -27,6 +27,7 @@ const ContactList = ({ setIsAuthenticated }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
 
@@ -55,13 +56,15 @@ const ContactList = ({ setIsAuthenticated }) => {
       else if (!endDate) {
         alert("Select End Date")
       }
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('https://screeching-chivalrous-stamp.glitch.me/getcontacts/by-date', {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { startDate, endDate },
-      });
-      setContacts(response.data.contacts);
+      else {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await axios.get('https://screeching-chivalrous-stamp.glitch.me/getcontacts/by-date', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { startDate, endDate },
+        });
+        setContacts(response.data.contacts);
+      }
     } catch (error) {
       console.error('Error fetching contacts', error);
     }
@@ -94,10 +97,13 @@ const ContactList = ({ setIsAuthenticated }) => {
     const name = contact.name ? contact.name.toLowerCase() : (contact.Name ? contact.Name.toLowerCase() : '');
     const email = contact.email ? contact.email.toLowerCase() : (contact.Email ? contact.Email.toLowerCase() : '');
     const address = contact.address ? contact.address.toLowerCase() : (contact.Address ? contact.Address.toLowerCase() : '');
+    const phone = contact.phone ? contact.phone.toLowerCase() : (contact.phone ? contact.phone.toLowerCase() : '');
+
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
     return (
-      name.includes(lowerCaseFilter) ||
-      email.includes(lowerCaseFilter) ||
-      address.includes(lowerCaseFilter)
+      (name.includes(lowerCaseFilter) || email.includes(lowerCaseFilter) || address.includes(lowerCaseFilter)) || phone.includes(lowerCaseFilter)) && 
+      (name.includes(lowerCaseSearchTerm) || email.includes(lowerCaseSearchTerm) || address.includes(lowerCaseSearchTerm)|| phone.includes(lowerCaseSearchTerm)
     );
   }).sort((a, b) => {
     const aField = a[sortField] ? a[sortField].toLowerCase() : '';
@@ -161,23 +167,32 @@ const ContactList = ({ setIsAuthenticated }) => {
   const header = () => {
     return (
       <div className="header-container ">
-        <div>
-          <button className="btn btn-primary" onClick={handleAddContactClick}><AiOutlinePlus /> Add Contact</button>
-          <label htmlFor="file-upload" className="custom-file-upload mx-2" style={{ border: "1px solid blue", borderRadius: "4px", padding: "5px", backgroundColor: "blue", color: "white" }}>
-            <input id="file-upload" type="file" style={{ display: 'none' }} ref={fileInputRef} onChange={fileHandler} accept=".xls,.xlsx" />
-            <FaCloudUploadAlt /> Upload contacts
-          </label>
+        <div className='d-flex p-2'>
+          <div className='d-flex'>
+            <label className='pt-2'>Select Start Date: </label>
+            {/* <Datetime value={startDate} onChange={handleDateChange} dateFormat="DD/MM/YY" timeFormat="hh:mm A" className='form-control mt-3 mx-2' inputProps={{ placeholder: 'DD/MM/YY HH:MM AM/PM' }}/> */}
+            <input type="date" value={startDate} onChange={handleStartDateChange} placeholder="Start Date" className='form-control mx-2' style={{ width: "150px", height: "40px" }} />
+          </div>
+          <div className='d-flex'>
+            <label className='pt-2'>Select End Date: </label>
+            {/* <Datetime value={endDate} onChange={handleEndDateChange} dateFormat="DD/MM/YY" timeFormat="hh:mm A" className='form-control mt-3 mx-2' inputProps={{ placeholder: 'DD/MM/YY HH:MM AM/PM' }}/> */}
+            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate ? new Date(new Date(startDate).setDate(new Date(startDate).getDate() + 1)).toISOString().split('T')[0] : ''} placeholder="End Date" className='form-control mx-2' style={{ width: "150px", height: "40px" }} />
+          </div>
+          <button onClick={fetchContactsByDate} className="form-button mx-3" style={{ width: "100px", height: "40px" }}>Filter</button>
         </div>
         <div>
-          <button onClick={() => downloadFile('csv')} className="btn btn-success mx-2">Download CSV</button>
-          <button onClick={() => downloadFile('excel')} className="btn btn-info mx-2">Download Excel</button>
 
-          <select className="sort-select mx-2" onChange={(e) => setSortField(e.target.value)}>
-            <option value="name">Sort by Name</option>
-            <option value="email">Sort by Email</option>
-            <option value="phone">Sort by MobileNumber</option>
-            <option value="address">Sort by Address</option>
-          </select>
+          <div className='d-flex'>
+
+            <select className="sort-select mx-2" onChange={(e) => setSortField(e.target.value)}>
+              <option value="name">Sort by Name</option>
+              <option value="email">Sort by Email</option>
+              <option value="phone">Sort by MobileNumber</option>
+              <option value="address">Sort by Address</option>
+            </select>
+            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, address,mobileNumber" className='form-control mx-2' style={{ width: "200px" }}/>
+
+          </div>
         </div>
       </div>
     );
@@ -248,11 +263,19 @@ const ContactList = ({ setIsAuthenticated }) => {
 
   const onLogout = () => {
     localStorage.removeItem('token');
-    let token =localStorage.getItem('token');
+    let token = localStorage.getItem('token');
     // navigate("/login")
-    setIsAuthenticated(token); 
+    setIsAuthenticated(token);
     navigate('/login', { replace: true });
   }
+
+  const handleStartDateChange = (e) => {
+    const selectedStartDate = e.target.value;
+    setStartDate(selectedStartDate);
+    if (endDate && new Date(selectedStartDate) >= new Date(endDate)) {
+      setEndDate('');
+    }
+  };
 
   return (
     <div className='m-5'>
@@ -263,19 +286,18 @@ const ContactList = ({ setIsAuthenticated }) => {
       </div>
       <Card style={{ padding: '20px' }} >
         <div style={{ marginTop: '5px' }}>
-          <div className="filter-section">
-            <div className='d-flex p-2'>
-              <div className='d-flex'>
-                <label className='px-2 pt-4'>Select Start Date: </label>
-                {/* <Datetime value={startDate} onChange={handleDateChange} dateFormat="DD/MM/YY" timeFormat="hh:mm A" className='form-control mt-3 mx-2' inputProps={{ placeholder: 'DD/MM/YY HH:MM AM/PM' }}/> */}
-                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} placeholder="Start Date" className='form-control mt-3 mx-2' style={{ width: "150px" }} />
-              </div>
-              <div className='d-flex'>
-                <label className='px-3 pt-4'>Select End Date: </label>
-                {/* <Datetime value={endDate} onChange={handleEndDateChange} dateFormat="DD/MM/YY" timeFormat="hh:mm A" className='form-control mt-3 mx-2' inputProps={{ placeholder: 'DD/MM/YY HH:MM AM/PM' }}/> */}
-                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} placeholder="End Date" className='form-control mt-3 mx-2' style={{ width: "150px" }} />
-              </div>
-              <button onClick={fetchContactsByDate} className="form-button mx-3 mt-3" style={{ width: "100px", height: "50px" }}>Filter</button>
+          <div className="filter-section d-flex justify-content-between mb-3">
+
+            <div>
+              <button className="btn btn-primary p-2" onClick={handleAddContactClick}><AiOutlinePlus /> Add Contact</button>
+              <label htmlFor="file-upload" className="btn btn-primary mx-2 p-2" >
+                <input id="file-upload" type="file" style={{ display: 'none' }} ref={fileInputRef} onChange={fileHandler} accept=".xls,.xlsx" />
+                <FaCloudUploadAlt /> Upload contacts
+              </label>
+            </div>
+            <div>
+              <button onClick={() => downloadFile('csv')} className="btn btn-success mx-2">Download CSV</button>
+              <button onClick={() => downloadFile('excel')} className="btn btn-info mx-2">Download Excel</button>
             </div>
           </div>
 
